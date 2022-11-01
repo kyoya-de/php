@@ -386,6 +386,19 @@ RUN set -eux; \
 		--enable-fpm \
 		--with-fpm-user=www-data \
 		--with-fpm-group=www-data \
+{{ ) elif env.variant == "fpm-zts" then ( -}}
+		\
+{{ if (.version | version_id) >= ("8" | version_id) then ( -}}
+		--enable-zts \
+{{ ) else ( -}}
+		--enable-maintainer-zts \
+{{ ) end -}}
+# https://externals.io/message/118859
+		--disable-zend-signals \
+		\
+		--enable-fpm \
+		--with-fpm-user=www-data \
+		--with-fpm-group=www-data \
 {{ ) elif env.variant == "zts" then ( -}}
 		\
 {{ if (.version | version_id) >= ("8" | version_id) then ( -}}
@@ -474,7 +487,7 @@ COPY apache2-foreground /usr/local/bin/
 WORKDIR /var/www/html
 
 EXPOSE 80
-{{ ) elif env.variant == "fpm" then ( -}}
+{{ ) elif (env.variant == "fpm") or (env.variant == "fpm-zts") then ( -}}
 WORKDIR /var/www/html
 
 RUN set -eux; \
